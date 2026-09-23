@@ -1,0 +1,320 @@
+// Prisma Schema for CollabRoom Platform (Neon Lakebase PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                String      @id @default(uuid())
+  email             String      @unique
+  passwordHash      String
+  fullName          String
+  avatarUrl         String?
+  bio               String?
+  phone             String?
+  isEmailVerified   Boolean     @default(true)
+  systemRole        String      @default("USER") // "USER" | "ADMIN"
+  status            String      @default("ACTIVE") // "ACTIVE" | "SUSPENDED"
+  storageUsedBytes  BigInt      @default(0)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relationships
+  ownedRooms              Room[]                   @relation("RoomOwner")
+  roomMemberships         RoomMember[]
+  uploadedFiles           File[]                   @relation("FileUploader")
+  fileVersions            FileVersion[]            @relation("VersionUploader")
+  createdFolders          Folder[]                 @relation("FolderCreator")
+  sentInvitations         Invitation[]             @relation("InvitedByUser")
+  createdInviteLinks      RoomInviteLink[]         @relation("InviteLinkCreator")
+  comments                Comment[]
+  notifications           Notification[]
+  activityLogs            ActivityLog[]
+  favorites               Favorite[]
+  refreshTokens           RefreshToken[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+
+  @@index([email])
+  @@index([systemRole])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+}
+
+model Room {
+  id              String       @id @default(uuid())
+  name            String
+  description     String?
+  icon            String?      @default("FolderKanban")
+  color           String?      @default("#4F46E5")
+  privacy         String       @default("PRIVATE") // "PRIVATE" | "INVITE_ONLY"
+  maxStorageBytes BigInt       @default(10737418240) // 10 GB default
+  isArchived      Boolean      @default(false)
+  createdById     String
+  owner           User         @relation("RoomOwner", fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  // Relationships
+  members       RoomMember[]
+  files         File[]
+  folders       Folder[]
+  invitations   Invitation[]
+  inviteLinks   RoomInviteLink[]
+  activityLogs  ActivityLog[]
+  favorites     Favorite[]
+  notifications Notification[]
+
+  @@index([createdById])
+  @@index([name])
+}
+
+model RoomMember {
+  id           String      @id @default(uuid())
+  roomId       String
+  room         Room        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role         String      @default("VIEWER") // "OWNER" | "MANAGER" | "EDITOR" | "VIEWER"
+  joinedAt     DateTime    @default(now())
+  lastActiveAt DateTime    @default(now())
+
+  permission   RoomMemberPermission?
+
+  @@unique([roomId, userId])
+  @@index([roomId])
+  @@index([userId])
+}
+
+model RoomMemberPermission {
+  id                    String     @id @default(uuid())
+  roomMemberId          String     @unique
+  roomMember            RoomMember @relation(fields: [roomMemberId], references: [id], onDelete: Cascade)
+  canView               Boolean    @default(true)
+  canUpload             Boolean    @default(false)
+  canDownload           Boolean    @default(true)
+  canEdit               Boolean    @default(false)
+  canDelete             Boolean    @default(false)
+  canRename             Boolean    @default(false)
+  canMove               Boolean    @default(false)
+  canShare              Boolean    @default(false)
+  canManageMembers      Boolean    @default(false)
+  canManagePermissions  Boolean    @default(false)
+  updatedAt             DateTime   @updatedAt
+}
+
+model Folder {
+  id          String    @id @default(uuid())
+  name        String
+  roomId      String
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      Folder?   @relation("SubFolders", fields: [parentId], references: [id], onDelete: Cascade)
+  subFolders  Folder[]  @relation("SubFolders")
+  createdById String
+  creator     User      @relation("FolderCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  color       String?   @default("#6366F1")
+  isTrash     Boolean   @default(false)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  files       File[]
+  favorites   Favorite[]
+
+  @@index([roomId])
+  @@index([parentId])
+}
+
+model File {
+  id             String        @id @default(uuid())
+  name           String
+  originalName   String
+  mimeType       String
+  extension      String
+  sizeBytes      BigInt
+  storageKey     String
+  roomId         String
+  room           Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  folderId       String?
+  folder         Folder?       @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  uploadedById   String
+  uploader       User          @relation("FileUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  isTrash        Boolean       @default(false)
+  deletedAt      DateTime?
+  currentVersion Int           @default(1)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  versions       FileVersion[]
+  comments       Comment[]
+  favorites      Favorite[]
+
+  @@index([roomId])
+  @@index([folderId])
+  @@index([uploadedById])
+  @@index([isTrash])
+}
+
+model FileVersion {
+  id            String   @id @default(uuid())
+  fileId        String
+  file          File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  versionNumber Int
+  storageKey    String
+  sizeBytes     BigInt
+  uploadedById  String
+  uploader      User     @relation("VersionUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+  changeSummary String?
+  createdAt     DateTime @default(now())
+
+  @@unique([fileId, versionNumber])
+  @@index([fileId])
+}
+
+model Invitation {
+  id          String           @id @default(uuid())
+  roomId      String
+  room        Room             @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  email       String
+  invitedById String
+  inviter     User             @relation("InvitedByUser", fields: [invitedById], references: [id], onDelete: Cascade)
+  role        String           @default("VIEWER")
+  token       String           @unique
+  status      String           @default("PENDING") // "PENDING" | "ACCEPTED" | "REJECTED" | "EXPIRED"
+  expiresAt   DateTime
+  createdAt   DateTime         @default(now())
+
+  @@index([roomId])
+  @@index([email])
+  @@index([token])
+}
+
+model RoomInviteLink {
+  id          String     @id @default(uuid())
+  roomId      String
+  room        Room       @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  code        String     @unique
+  defaultRole String     @default("VIEWER")
+  createdById String
+  creator     User       @relation("InviteLinkCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime?
+  isActive    Boolean    @default(true)
+  maxUses     Int?
+  usedCount   Int        @default(0)
+  createdAt   DateTime   @default(now())
+
+  @@index([roomId])
+  @@index([code])
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  fileId    String
+  file      File      @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([fileId])
+  @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId    String?
+  room      Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid())
+  roomId     String?
+  room       Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  entityType String
+  entityId   String?
+  details    String?  // JSON stringified details
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([roomId])
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId    String?
+  room      Room?    @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  fileId    String?
+  file      File?    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  folderId  String?
+  folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roomId, fileId, folderId])
+  @@index([userId])
+}

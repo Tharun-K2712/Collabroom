@@ -1,0 +1,22 @@
+{
+  "name": "@collabroom/cli",
+  "version": "1.0.0",
+  "description": "CollabRoom Command Line Interface for terminal access and real-time document synchronization",
+  "main": "dist/index.js",
+  "bin": {
+    "collabroom": "./bin/collabroom.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/collabroom.js",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

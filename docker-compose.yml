@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: collabroom-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: collabroom
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - collabroom-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: collabroom-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - collabroom-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: collabroom-api
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://postgres:postgrespassword@postgres:5432/collabroom?schema=public
+      JWT_SECRET: collabroom_production_jwt_secret_token_12345
+      JWT_REFRESH_SECRET: collabroom_production_refresh_token_67890
+      FRONTEND_URL: http://localhost:3000
+      STORAGE_PROVIDER: local
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - api_uploads:/app/apps/api/uploads
+    networks:
+      - collabroom-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: collabroom-web
+    restart: always
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+      NEXT_PUBLIC_SOCKET_URL: http://localhost:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - collabroom-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  api_uploads:
+
+networks:
+  collabroom-network:
+    driver: bridge
