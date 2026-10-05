@@ -74,14 +74,14 @@ async function reset() {
     }
   }
 
-  const apiUploadsDir = path.resolve(process.cwd(), 'apps/api/uploads');
-  if (fs.existsSync(apiUploadsDir)) {
+  const backendUploadsDir = path.resolve(process.cwd(), 'backend/uploads');
+  if (fs.existsSync(backendUploadsDir)) {
     try {
-      fs.rmSync(apiUploadsDir, { recursive: true, force: true });
-      fs.mkdirSync(apiUploadsDir, { recursive: true });
-      console.log('📁 Cleaned apps/api/uploads directory');
+      fs.rmSync(backendUploadsDir, { recursive: true, force: true });
+      fs.mkdirSync(backendUploadsDir, { recursive: true });
+      console.log('📁 Cleaned backend/uploads directory');
     } catch (err) {
-      console.warn('Could not clean apps/api/uploads dir:', err);
+      console.warn('Could not clean backend/uploads dir:', err);
     }
   }
 

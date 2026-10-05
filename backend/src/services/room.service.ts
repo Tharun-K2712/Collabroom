@@ -2,7 +2,7 @@ import { RoomRepository } from '../repositories/room.repository';
 import { MemberRepository } from '../repositories/member.repository';
 import { ActivityRepository } from '../repositories/activity.repository';
 import { NotFoundError, ForbiddenError, BadRequestError } from '../utils/errors';
-import { DEFAULT_ROLE_PERMISSIONS, RoomDTO, MemberRole, RoomPrivacy } from '@collabroom/shared';
+import { DEFAULT_ROLE_PERMISSIONS, RoomDTO, MemberRole, RoomPrivacy } from '@/types/shared';
 
 export class RoomService {
   static async createRoom(

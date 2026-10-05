@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "frontend",
+    "backend",
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:api\" \"npm run dev:web\"",
-    "dev:api": "npm --workspace=apps/api run dev",
-    "dev:web": "npm --workspace=apps/web run dev",
+    "dev": "concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,magenta\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:frontend": "npm --workspace=frontend run dev",
     "build": "npm run build --workspaces --if-present",
-    "test": "npm --workspace=apps/api test",
-    "db:reset": "tsx apps/api/src/scripts/reset_db.ts",
+    "test": "npm --workspace=backend test",
+    "db:reset": "tsx backend/src/scripts/reset_db.ts",
     "cli": "node packages/cli/bin/collabroom.js"
   },
   "devDependencies": {

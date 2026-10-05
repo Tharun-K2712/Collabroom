@@ -59,7 +59,7 @@ if not exist "node_modules" (
 
 :: 5. Generate Prisma Client if needed
 echo [INFO] Generating Prisma client...
-call npm --workspace=apps/api run prisma:generate >nul 2>&1
+call npm --workspace=backend run prisma:generate >nul 2>&1
 
 :: 6. Launch browser automatically after 5 seconds in background
 start "" /B cmd /c "timeout /t 5 /nobreak >nul && start http://localhost:3000"

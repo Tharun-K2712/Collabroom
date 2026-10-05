@@ -5,7 +5,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../providers/ToastProvider';
 import { api } from '@/lib/api';
-import { RoomMemberPermissions } from '@collabroom/shared';
+import { RoomMemberPermissions } from '@/types/shared';
 import { ShieldCheck, Lock, Check } from 'lucide-react';
 
 interface PermissionMatrixModalProps {

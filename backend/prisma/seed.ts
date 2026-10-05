@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { DEFAULT_ROLE_PERMISSIONS } from '@collabroom/shared';
+import { DEFAULT_ROLE_PERMISSIONS } from '../src/types/shared';
 
 const prisma = new PrismaClient();
 

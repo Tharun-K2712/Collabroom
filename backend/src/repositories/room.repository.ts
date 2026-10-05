@@ -1,5 +1,5 @@
 import { prisma } from '../config/db';
-import { DEFAULT_ROLE_PERMISSIONS } from '@collabroom/shared';
+import { DEFAULT_ROLE_PERMISSIONS } from '@/types/shared';
 
 export class RoomRepository {
   static async create(data: {

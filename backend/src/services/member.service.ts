@@ -4,7 +4,7 @@ import { RoomRepository } from '../repositories/room.repository';
 import { ActivityRepository } from '../repositories/activity.repository';
 import { NotificationRepository } from '../repositories/notification.repository';
 import { NotFoundError, ForbiddenError, BadRequestError, ConflictError } from '../utils/errors';
-import { MemberRole, RoomMemberPermissions } from '@collabroom/shared';
+import { MemberRole, RoomMemberPermissions } from '@/types/shared';
 import crypto from 'crypto';
 
 export class MemberService {
