@@ -47,6 +47,16 @@ export const createApp = () => {
     app.use(morgan('dev'));
   }
 
+  // Root and Health Check Endpoints (for Render and uptime monitors)
+  app.get(['/', '/health'], (req, res) => {
+    res.status(200).json({
+      status: 'healthy',
+      service: 'CollabRoom API Server',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+    });
+  });
+
   // Global Rate Limiting
   app.use('/api', globalLimiter);
 
