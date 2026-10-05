@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ForbiddenError, NotFoundError, UnauthorizedError } from '../utils/errors';
 import { prisma } from '../config/db';
-import { MemberRole, DEFAULT_ROLE_PERMISSIONS, RoomMemberPermissions } from '@/types/shared';
+import { MemberRole, DEFAULT_ROLE_PERMISSIONS, RoomMemberPermissions } from '../types/shared';
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

@@ -9,7 +9,7 @@ import {
   updateMemberPermissionsSchema,
   createInviteLinkSchema,
 } from '../validators/member.validator';
-import { MemberRole } from '@/types/shared';
+import { MemberRole } from '../types/shared';
 
 const router = Router({ mergeParams: true });
 

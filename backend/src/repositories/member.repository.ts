@@ -1,5 +1,5 @@
 import { prisma } from '../config/db';
-import { DEFAULT_ROLE_PERMISSIONS, RoomMemberPermissions, MemberRole } from '@/types/shared';
+import { DEFAULT_ROLE_PERMISSIONS, RoomMemberPermissions, MemberRole } from '../types/shared';
 
 export class MemberRepository {
   static async findMember(roomId: string, userId: string) {

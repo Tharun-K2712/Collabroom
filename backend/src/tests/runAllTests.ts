@@ -10,7 +10,7 @@
 
 import { hashPassword, comparePassword } from '../utils/password';
 import { signAccessToken, verifyAccessToken } from '../utils/jwt';
-import { DEFAULT_ROLE_PERMISSIONS, MemberRole } from '@/types/shared';
+import { DEFAULT_ROLE_PERMISSIONS, MemberRole } from '../types/shared';
 import { StorageService } from '../services/storage.service';
 
 async function runTests() {

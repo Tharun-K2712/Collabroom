@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/auth';
 import { requireRoomMember, requireRole } from '../middleware/rbac';
 import { validate } from '../middleware/validation';
 import { createRoomSchema, updateRoomSchema } from '../validators/room.validator';
-import { MemberRole } from '@/types/shared';
+import { MemberRole } from '../types/shared';
 
 const router = Router();
 
