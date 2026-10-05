@@ -7,11 +7,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
+    "dev": "concurrently -n \"API,WEB\" -c \"cyan,magenta\" \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "npm --workspace=apps/api run dev",
     "dev:web": "npm --workspace=apps/web run dev",
     "build": "npm run build --workspaces --if-present",
     "test": "npm --workspace=apps/api test",
+    "db:reset": "tsx apps/api/src/scripts/reset_db.ts",
     "cli": "node packages/cli/bin/collabroom.js"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
   }
 }
