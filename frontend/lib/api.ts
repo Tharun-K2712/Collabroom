@@ -11,7 +11,16 @@ export interface ApiResponse<T = any> {
   };
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const getApiBase = () => {
+  let url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+  url = url.trim();
+  if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+    url = `https://${url}`;
+  }
+  return url.replace(/\/+$/, '');
+};
+
+const API_BASE = getApiBase();
 
 class ApiClient {
   private token: string | null = null;

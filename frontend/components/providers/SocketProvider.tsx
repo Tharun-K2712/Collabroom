@@ -31,7 +31,11 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
 
     const token = localStorage.getItem('collabroom_access_token');
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+    let socketUrl = (process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000').trim();
+    if (socketUrl && !socketUrl.startsWith('http://') && !socketUrl.startsWith('https://')) {
+      socketUrl = `https://${socketUrl}`;
+    }
+    socketUrl = socketUrl.replace(/\/+$/, '');
 
     const s = io(socketUrl, {
       auth: { token },
