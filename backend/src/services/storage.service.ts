@@ -42,14 +42,8 @@ export class StorageService {
     return StorageProvider.deleteObject(storageKey);
   }
 
-  static saveLocalFile(storageKey: string, fileBuffer: Buffer) {
-    const fullPath = path.join(UPLOADS_DIR, storageKey);
-    const dir = path.dirname(fullPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(fullPath, fileBuffer);
-    return fullPath;
+  static async saveLocalFile(storageKey: string, fileBuffer: Buffer, mimeType?: string) {
+    return StorageProvider.saveLocalFile(storageKey, fileBuffer, mimeType);
   }
 
   static getLocalFilePath(storageKey: string): string | null {
@@ -58,5 +52,9 @@ export class StorageService {
       return fullPath;
     }
     return null;
+  }
+
+  static async getLocalFileBuffer(storageKey: string): Promise<{ buffer: Buffer; mimeType?: string } | null> {
+    return StorageProvider.getLocalFile(storageKey);
   }
 }

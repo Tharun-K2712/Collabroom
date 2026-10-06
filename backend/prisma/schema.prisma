@@ -318,3 +318,14 @@ model Favorite {
   @@unique([userId, roomId, fileId, folderId])
   @@index([userId])
 }
+
+model FileBlob {
+  storageKey String   @id
+  data       Bytes
+  mimeType   String?
+  sizeBytes  BigInt?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([storageKey])
+}

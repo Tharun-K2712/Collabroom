@@ -202,13 +202,22 @@ export default function RoomDetailsPage() {
     setFolderPath((prev) => prev.slice(0, idx + 1));
   };
 
-  // File Download with S3 presigned URL
+  // File Download
   const handleDownloadFile = async (fileId: string, fileName: string) => {
     try {
       const res = await api.get<any>(`/files/${fileId}/download-url`);
       if (res.success && res.data?.downloadUrl) {
-        const fullUrl = getFullFileUrl(res.data.downloadUrl);
-        window.open(fullUrl, '_blank');
+        let fullUrl = getFullFileUrl(res.data.downloadUrl);
+        if (!fullUrl.includes('download=')) {
+          fullUrl = `${fullUrl}${fullUrl.includes('?') ? '&' : '?'}download=1`;
+        }
+        const a = document.createElement('a');
+        a.href = fullUrl;
+        a.download = fileName;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
         success(`Downloading "${fileName}"`);
       }
     } catch (err: any) {

@@ -197,7 +197,7 @@ export class StorageController {
         return res.status(400).json({ success: false, message: 'No file uploaded' });
       }
 
-      StorageService.saveLocalFile(storageKey, buffer);
+      await StorageService.saveLocalFile(storageKey, buffer, req.file?.mimetype);
       return res.status(200).json({ success: true, message: 'Uploaded successfully', storageKey });
     } catch (error) {
       next(error);
@@ -212,13 +212,47 @@ export class StorageController {
         return res.status(400).send('Missing key');
       }
 
-      const filePath = StorageService.getLocalFilePath(storageKey);
-      if (!filePath || !fs.existsSync(filePath)) {
-        return res.status(404).send('File not found on disk');
+      const fileData = await StorageService.getLocalFileBuffer(storageKey);
+      if (!fileData) {
+        return res.status(404).send('File not found in storage');
       }
 
-      res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(filename)}"`);
-      return res.sendFile(path.resolve(filePath));
+      const ext = path.extname(filename).toLowerCase();
+      const mimeTypes: Record<string, string> = {
+        '.pdf': 'application/pdf',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp',
+        '.svg': 'image/svg+xml',
+        '.txt': 'text/plain; charset=utf-8',
+        '.html': 'text/html; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.js': 'text/javascript; charset=utf-8',
+        '.json': 'application/json; charset=utf-8',
+        '.csv': 'text/csv; charset=utf-8',
+        '.mp4': 'video/mp4',
+        '.webm': 'video/webm',
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav',
+        '.zip': 'application/zip',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.ppt': 'application/vnd.ms-powerpoint',
+        '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      };
+
+      const contentType = fileData.mimeType || mimeTypes[ext] || 'application/octet-stream';
+      const isAttachment = req.query.download === 'true' || req.query.download === '1';
+      const dispositionType = isAttachment ? 'attachment' : 'inline';
+
+      res.setHeader('Content-Type', contentType);
+      res.setHeader('Content-Disposition', `${dispositionType}; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.send(fileData.buffer);
     } catch (error) {
       next(error);
     }

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { AiController } from '../controllers/ai.controller';
 import { SearchController } from '../controllers/search.controller';
 import { AdminController } from '../controllers/admin.controller';
@@ -33,8 +33,9 @@ adminRouter.patch('/users/:userId/status', AdminController.updateUserStatus);
 adminRouter.get('/rooms', AdminController.listRooms);
 
 // Local storage upload/download handler (zero-setup fallback when AWS credentials aren't present)
-storageRouter.put('/local-upload', upload.single('file'), StorageController.handleLocalUpload);
-storageRouter.post('/local-upload', upload.single('file'), StorageController.handleLocalUpload);
+const rawBodyParser = express.raw({ type: '*/*', limit: '100mb' });
+storageRouter.put('/local-upload', upload.single('file'), rawBodyParser, StorageController.handleLocalUpload);
+storageRouter.post('/local-upload', upload.single('file'), rawBodyParser, StorageController.handleLocalUpload);
 storageRouter.get('/local-download', StorageController.handleLocalDownload);
 
 export { aiRouter, searchRouter, adminRouter, storageRouter };

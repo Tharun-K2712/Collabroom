@@ -422,15 +422,25 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
           </span>
           <div className="flex items-center gap-3">
             {downloadUrl && (
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-card text-xs text-muted hover:text-white transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Open in Tab</span>
-              </a>
+              <>
+                <a
+                  href={`${downloadUrl}${downloadUrl.includes('?') ? '&' : '?'}download=1`}
+                  download={file?.originalName || 'download'}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors shadow-sm"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download</span>
+                </a>
+                <a
+                  href={downloadUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-card text-xs text-muted hover:text-white transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Open in Tab</span>
+                </a>
+              </>
             )}
             <Button type="button" variant="outline" onClick={onClose}>
               Close

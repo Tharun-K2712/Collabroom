@@ -1,6 +1,7 @@
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ENV } from './env';
+import { prisma } from './db';
 import path from 'path';
 import fs from 'fs';
 
@@ -79,11 +80,11 @@ export class StorageProvider {
         Key: storageKey,
       });
       const response = await s3Client.send(command);
-      return await response.Body?.transformToString('utf-8') || '';
+      return (await response.Body?.transformToString('utf-8')) || '';
     } else {
-      const localFilePath = path.join(UPLOADS_DIR, storageKey);
-      if (fs.existsSync(localFilePath)) {
-        return fs.readFileSync(localFilePath, 'utf-8');
+      const local = await this.getLocalFile(storageKey);
+      if (local && local.buffer) {
+        return local.buffer.toString('utf-8');
       }
       return '';
     }
@@ -100,13 +101,76 @@ export class StorageProvider {
       });
       await s3Client.send(command);
     } else {
-      const localFilePath = path.join(UPLOADS_DIR, storageKey);
-      const dir = path.dirname(localFilePath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(localFilePath, buffer);
+      await this.saveLocalFile(storageKey, buffer, mimeType);
     }
+  }
+
+  static async saveLocalFile(storageKey: string, fileBuffer: Buffer, mimeType?: string): Promise<string> {
+    const localFilePath = path.join(UPLOADS_DIR, storageKey);
+    const dir = path.dirname(localFilePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(localFilePath, fileBuffer);
+
+    // Persist to Neon Postgres so files survive Render instance restarts & redeploys
+    try {
+      await (prisma as any).fileBlob?.upsert({
+        where: { storageKey },
+        update: {
+          data: fileBuffer,
+          mimeType: mimeType || null,
+          sizeBytes: BigInt(fileBuffer.length),
+        },
+        create: {
+          storageKey,
+          data: fileBuffer,
+          mimeType: mimeType || null,
+          sizeBytes: BigInt(fileBuffer.length),
+        },
+      });
+    } catch (err) {
+      console.warn('Could not persist file blob to database fallback:', err);
+    }
+
+    return localFilePath;
+  }
+
+  static async getLocalFile(storageKey: string): Promise<{ buffer: Buffer; mimeType?: string } | null> {
+    const localFilePath = path.join(UPLOADS_DIR, storageKey);
+
+    // 1. Check disk cache
+    if (fs.existsSync(localFilePath)) {
+      try {
+        const buffer = fs.readFileSync(localFilePath);
+        return { buffer };
+      } catch (err) {
+        console.warn(`Error reading disk cache for ${storageKey}:`, err);
+      }
+    }
+
+    // 2. Fetch from Neon Postgres
+    try {
+      const blob = await (prisma as any).fileBlob?.findUnique({
+        where: { storageKey },
+      });
+      if (blob && blob.data) {
+        const buffer = Buffer.from(blob.data);
+        // Cache back to disk
+        try {
+          const dir = path.dirname(localFilePath);
+          if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+          }
+          fs.writeFileSync(localFilePath, buffer);
+        } catch {}
+        return { buffer, mimeType: blob.mimeType || undefined };
+      }
+    } catch (err) {
+      console.error('Error fetching file blob from database:', err);
+    }
+
+    return null;
   }
 
   static async deleteObject(storageKey: string): Promise<void> {
@@ -119,8 +183,15 @@ export class StorageProvider {
     } else {
       const localFilePath = path.join(UPLOADS_DIR, storageKey);
       if (fs.existsSync(localFilePath)) {
-        fs.unlinkSync(localFilePath);
+        try {
+          fs.unlinkSync(localFilePath);
+        } catch {}
       }
+      try {
+        await (prisma as any).fileBlob?.delete({
+          where: { storageKey },
+        }).catch(() => {});
+      } catch {}
     }
   }
 }
