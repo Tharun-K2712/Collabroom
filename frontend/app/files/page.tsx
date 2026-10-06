@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { api, getFullFileUrl } from '@/lib/api';
+import { api, getFullFileUrl, downloadFileFromUrl } from '@/lib/api';
+import { useToast } from '@/components/providers/ToastProvider';
 import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
 import { FileText, Download, Eye, Search, FolderKanban, Loader2, Laptop } from 'lucide-react';
 import { FilePreviewModal } from '@/components/files/FilePreviewModal';
@@ -10,6 +11,7 @@ import { OpenWithModal } from '@/components/files/OpenWithModal';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function FilesPage() {
+  const { success, error } = useToast();
   const [files, setFiles] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [selectedExt, setSelectedExt] = useState<string>('ALL');
@@ -17,6 +19,18 @@ export default function FilesPage() {
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
   const [openWithFile, setOpenWithFile] = useState<any | null>(null);
   const [openWithDownloadUrl, setOpenWithDownloadUrl] = useState<string | null>(null);
+
+  const handleDownloadFile = async (file: any) => {
+    try {
+      const res = await api.get<any>(`/files/${file.id}/download-url`);
+      if (res.success && res.data?.downloadUrl) {
+        success(`Downloading "${file.name}"...`);
+        await downloadFileFromUrl(res.data.downloadUrl, file.originalName || file.name);
+      }
+    } catch (err: any) {
+      error(err.message || 'Download failed');
+    }
+  };
 
   const handleOpenWithApp = async (file: any) => {
     setOpenWithFile(file);
@@ -161,6 +175,14 @@ export default function FilesPage() {
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>Preview</span>
+                          </button>
+                          <button
+                            onClick={() => handleDownloadFile(file)}
+                            title="Download Document"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-input hover:bg-card border border-border text-xs text-slate-200 hover:text-emerald-400 transition-colors"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Download</span>
                           </button>
                         </div>
                       </td>

@@ -5,7 +5,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../providers/ToastProvider';
 import { formatBytes } from '@/lib/utils';
-import { getFullFileUrl } from '@/lib/api';
+import { getFullFileUrl, downloadFileFromUrl } from '@/lib/api';
 import {
   ExternalLink,
   Laptop,
@@ -63,7 +63,7 @@ export const OpenWithModal: React.FC<OpenWithModalProps> = ({
   userRole = 'EDITOR',
   onOpenInAppPreview,
 }) => {
-  const { success } = useToast();
+  const { success, error: toastError } = useToast();
   const [copiedCmd, setCopiedCmd] = useState(false);
   const [selectedAppId, setSelectedAppId] = useState<string>('');
 
@@ -306,12 +306,9 @@ export const OpenWithModal: React.FC<OpenWithModalProps> = ({
       success(`Opening "${file.name}" in ${app.name}...`);
       setTimeout(() => onClose(), 1000);
     } else if (app.actionType === 'download' && app.urlOrCommand) {
-      const a = document.createElement('a');
-      a.href = app.urlOrCommand;
-      a.download = file.originalName || file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      downloadFileFromUrl(app.urlOrCommand, file.originalName || file.name)
+        .then(() => success(`Downloaded "${file.name}"`))
+        .catch((err) => toastError(err.message || 'Download failed'));
       onClose();
     } else if (app.actionType === 'cli' && app.urlOrCommand) {
       handleCopyCliCommand(app.urlOrCommand);

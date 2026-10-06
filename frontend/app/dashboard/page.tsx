@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { api } from '@/lib/api';
+import { api, downloadFileFromUrl } from '@/lib/api';
+import { useToast } from '@/components/providers/ToastProvider';
 import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
 import {
   FolderKanban,
@@ -28,12 +29,25 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { success, error } = useToast();
   const [rooms, setRooms] = useState<any[]>([]);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [recentFiles, setRecentFiles] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [previewFileId, setPreviewFileId] = useState<string | null>(null);
+
+  const handleDownloadFile = async (file: any) => {
+    try {
+      const res = await api.get<any>(`/files/${file.id}/download-url`);
+      if (res.success && res.data?.downloadUrl) {
+        success(`Downloading "${file.name}"...`);
+        await downloadFileFromUrl(res.data.downloadUrl, file.originalName || file.name);
+      }
+    } catch (err: any) {
+      error(err.message || 'Download failed');
+    }
+  };
 
   const loadDashboardData = async () => {
     setIsLoading(true);
@@ -261,13 +275,24 @@ export default function DashboardPage() {
                             <td className="p-3.5 text-muted font-mono">{formatBytes(f.sizeBytes)}</td>
                             <td className="p-3.5 text-slate-300">{f.uploaderName || 'Member'}</td>
                             <td className="p-3.5 text-right">
-                              <button
-                                onClick={() => setPreviewFileId(f.id)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-input hover:bg-card border border-border text-xs text-slate-200 hover:text-white transition-colors"
-                              >
-                                <Eye className="w-3.5 h-3.5" />
-                                <span>Preview</span>
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => setPreviewFileId(f.id)}
+                                  title="Preview Document"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-input hover:bg-card border border-border text-xs text-slate-200 hover:text-white transition-colors"
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>Preview</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDownloadFile(f)}
+                                  title="Download Document"
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-input hover:bg-card border border-border text-xs text-slate-200 hover:text-emerald-400 transition-colors"
+                                >
+                                  <Download className="w-3.5 h-3.5" />
+                                  <span>Download</span>
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         );

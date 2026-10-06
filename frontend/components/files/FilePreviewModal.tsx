@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../providers/ToastProvider';
-import { api, getFullFileUrl } from '@/lib/api';
+import { api, getFullFileUrl, downloadFileFromUrl } from '@/lib/api';
 import { formatBytes, formatDate } from '@/lib/utils';
 import {
   Download,
@@ -32,10 +32,20 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
   fileId,
   onOpenWith,
 }) => {
-  const { error } = useToast();
+  const { success, error } = useToast();
   const [file, setFile] = useState<any>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleDownloadDirect = async () => {
+    if (!downloadUrl || !file) return;
+    try {
+      success(`Downloading "${file.name}"...`);
+      await downloadFileFromUrl(downloadUrl, file.originalName || file.name);
+    } catch (err: any) {
+      error(err.message || 'Download failed');
+    }
+  };
 
   // Editor states
   const [activeTab, setActiveTab] = useState<'preview' | 'edit'>('preview');
@@ -293,11 +303,54 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
           /* Preview View */
           <div className="min-h-[420px] max-h-[70vh] bg-slate-950/80 rounded-xl border border-border overflow-hidden flex items-center justify-center">
             {isPdf && downloadUrl && (
-              <iframe
-                src={`${downloadUrl}#toolbar=1`}
-                className="w-full h-[65vh] border-0"
-                title={file?.name}
-              />
+              <div className="w-full h-[65vh] flex flex-col bg-slate-900 rounded-xl overflow-hidden border border-border/60">
+                <div className="flex items-center justify-between px-3 py-2 bg-slate-950/90 border-b border-border/80 text-xs">
+                  <span className="text-slate-300 font-medium flex items-center gap-1.5 truncate max-w-md">
+                    <FileText className="w-4 h-4 text-primary-light flex-shrink-0" />
+                    <span className="truncate">{file?.name || 'PDF Document'}</span>
+                  </span>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => window.open(downloadUrl, '_blank')}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-input hover:bg-card border border-border text-xs text-slate-200 hover:text-white transition-colors"
+                      title="Open PDF in a full browser tab"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open in Full Tab</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownloadDirect}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors"
+                      title="Download PDF document"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download PDF</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="relative flex-1 w-full h-full min-h-[400px]">
+                  <object
+                    data={`${downloadUrl}#toolbar=1`}
+                    type="application/pdf"
+                    className="w-full h-full border-0"
+                  >
+                    <iframe
+                      src={`${downloadUrl}#toolbar=1`}
+                      className="w-full h-full border-0"
+                      title={file?.name}
+                    >
+                      <div className="p-8 text-center space-y-3">
+                        <p className="text-xs text-muted">Your browser does not support inline PDF preview.</p>
+                        <Button onClick={() => window.open(downloadUrl, '_blank')} size="sm">
+                          Open PDF in New Window
+                        </Button>
+                      </div>
+                    </iframe>
+                  </object>
+                </div>
+              </div>
             )}
 
             {isImage && downloadUrl && (
@@ -376,14 +429,14 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                     </button>
                   )}
                   {downloadUrl && (
-                    <a
-                      href={downloadUrl}
-                      download={file?.originalName}
+                    <button
+                      type="button"
+                      onClick={handleDownloadDirect}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card hover:bg-card-hover border border-border text-slate-200 text-xs font-semibold transition-colors shadow-md"
                     >
                       <Download className="w-4 h-4" />
                       <span>Download</span>
-                    </a>
+                    </button>
                   )}
                 </div>
               </div>
@@ -396,19 +449,20 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
                 </div>
                 <div>
                   <h3 className="font-semibold text-text text-base">{file?.name}</h3>
-                  <p className="text-xs text-muted mt-1">
-                    Download this file to view in your local application ({file?.extension?.toUpperCase()}).
+                  <p className="text-xs text-muted mt-1 max-w-md">
+                    Direct in-browser preview is not available for this file type ({file?.extension ? `.${file.extension.toUpperCase()}` : 'document'}).
+                    You can download and open it using your local computer applications.
                   </p>
                 </div>
                 {downloadUrl && (
-                  <a
-                    href={downloadUrl}
-                    download={file?.originalName}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold mt-3 transition-colors"
+                  <button
+                    type="button"
+                    onClick={handleDownloadDirect}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold mt-3 transition-colors shadow-md"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Download File</span>
-                  </a>
+                    <span>Download {file?.originalName || 'Document'}</span>
+                  </button>
                 )}
               </div>
             )}
@@ -423,23 +477,22 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
           <div className="flex items-center gap-3">
             {downloadUrl && (
               <>
-                <a
-                  href={`${downloadUrl}${downloadUrl.includes('?') ? '&' : '?'}download=1`}
-                  download={file?.originalName || 'download'}
+                <button
+                  type="button"
+                  onClick={handleDownloadDirect}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-semibold transition-colors shadow-sm"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download</span>
-                </a>
-                <a
-                  href={downloadUrl}
-                  target="_blank"
-                  rel="noreferrer"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.open(downloadUrl, '_blank')}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-card text-xs text-muted hover:text-white transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Open in Tab</span>
-                </a>
+                </button>
               </>
             )}
             <Button type="button" variant="outline" onClick={onClose}>

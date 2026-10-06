@@ -3,6 +3,7 @@ import { FileController } from '../controllers/file.controller';
 import { authenticate } from '../middleware/auth';
 import { requireRoomMember, requirePermission } from '../middleware/rbac';
 import { validate } from '../middleware/validation';
+import { ForbiddenError } from '../utils/errors';
 import {
   requestUploadUrlSchema,
   completeFileUploadSchema,
@@ -48,11 +49,16 @@ router.get(
   FileController.getFileDetails
 );
 
-// Download signed URL (Never expose public URLs, verified permission)
+// Download signed URL (Never expose public URLs, verified permission: canDownload or canView)
 router.get(
   '/files/:fileId/download-url',
   requireRoomMember(),
-  requirePermission('canDownload'),
+  (req, res, next) => {
+    if (req.roomPermissions?.canDownload || req.roomPermissions?.canView) {
+      return next();
+    }
+    return next(new ForbiddenError('You do not have permission to access this file'));
+  },
   FileController.getDownloadUrl
 );
 

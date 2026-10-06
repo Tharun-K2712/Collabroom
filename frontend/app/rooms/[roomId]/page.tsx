@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { api, getFullFileUrl } from '@/lib/api';
+import { api, getFullFileUrl, downloadFileFromUrl } from '@/lib/api';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
@@ -207,18 +207,8 @@ export default function RoomDetailsPage() {
     try {
       const res = await api.get<any>(`/files/${fileId}/download-url`);
       if (res.success && res.data?.downloadUrl) {
-        let fullUrl = getFullFileUrl(res.data.downloadUrl);
-        if (!fullUrl.includes('download=')) {
-          fullUrl = `${fullUrl}${fullUrl.includes('?') ? '&' : '?'}download=1`;
-        }
-        const a = document.createElement('a');
-        a.href = fullUrl;
-        a.download = fileName;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        success(`Downloading "${fileName}"`);
+        success(`Downloading "${fileName}"...`);
+        await downloadFileFromUrl(res.data.downloadUrl, fileName);
       }
     } catch (err: any) {
       error(err.message || 'Download forbidden');

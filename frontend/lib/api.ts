@@ -29,6 +29,49 @@ export const getFullFileUrl = (url: string | null | undefined): string => {
   return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
 };
 
+export const downloadFileFromUrl = async (fileUrl: string, fileName: string): Promise<void> => {
+  const fullUrl = getFullFileUrl(fileUrl);
+  if (!fullUrl) throw new Error('File URL is not available');
+
+  try {
+    // 1. Fetch file as Blob to bypass browser cross-origin download restrictions and popup blockers
+    const res = await fetch(fullUrl, { credentials: 'omit' });
+    if (!res.ok) {
+      throw new Error(`Download failed with status ${res.status}`);
+    }
+    const blob = await res.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 1500);
+  } catch (err) {
+    console.warn('Direct blob download failed, falling back to window navigation:', err);
+    // Fallback: direct browser navigation if fetch is blocked
+    let targetUrl = fullUrl;
+    if (!targetUrl.includes('download=')) {
+      targetUrl = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}download=1`;
+    }
+    const a = document.createElement('a');
+    a.href = targetUrl;
+    a.download = fileName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      if (document.body.contains(a)) document.body.removeChild(a);
+    }, 1500);
+  }
+};
+
 export const API_BASE = getApiBase();
 
 class ApiClient {

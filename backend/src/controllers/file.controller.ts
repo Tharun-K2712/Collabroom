@@ -252,6 +252,9 @@ export class StorageController {
       res.setHeader('Content-Type', contentType);
       res.setHeader('Content-Disposition', `${dispositionType}; filename="${encodeURIComponent(filename)}"`);
       res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.removeHeader('X-Frame-Options');
       return res.send(fileData.buffer);
     } catch (error) {
       next(error);

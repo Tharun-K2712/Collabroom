@@ -16,7 +16,9 @@ export const createApp = () => {
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginEmbedderPolicy: false,
       contentSecurityPolicy: false,
+      frameguard: false, // Allows cross-origin document embedding (e.g. Vercel iframe previews)
     })
   );
 
