@@ -22,6 +22,16 @@ export class StorageProvider {
     return ENV.AWS.STORAGE_PROVIDER === 's3' && !!ENV.AWS.ACCESS_KEY_ID && !!ENV.AWS.SECRET_ACCESS_KEY;
   }
 
+  static getBaseHost(): string {
+    if (process.env.RENDER_EXTERNAL_URL) {
+      return process.env.RENDER_EXTERNAL_URL.replace(/\/+$/, '');
+    }
+    if (process.env.API_URL) {
+      return process.env.API_URL.replace(/\/api\/?$/, '');
+    }
+    return '';
+  }
+
   static async generatePresignedUploadUrl(
     storageKey: string,
     mimeType: string,
@@ -38,7 +48,8 @@ export class StorageProvider {
     }
 
     // Local signed URL endpoint
-    const uploadUrl = `/api/storage/local-upload?key=${encodeURIComponent(storageKey)}`;
+    const baseHost = this.getBaseHost();
+    const uploadUrl = `${baseHost}/api/storage/local-upload?key=${encodeURIComponent(storageKey)}`;
     return { uploadUrl, storageKey, isS3: false };
   }
 
@@ -57,7 +68,8 @@ export class StorageProvider {
     }
 
     // Local download endpoint with temporary signed token
-    return `/api/storage/local-download?key=${encodeURIComponent(storageKey)}&filename=${encodeURIComponent(originalName)}`;
+    const baseHost = this.getBaseHost();
+    return `${baseHost}/api/storage/local-download?key=${encodeURIComponent(storageKey)}&filename=${encodeURIComponent(originalName)}`;
   }
 
   static async readObject(storageKey: string): Promise<string> {

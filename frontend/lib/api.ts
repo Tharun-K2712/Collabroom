@@ -20,7 +20,16 @@ const getApiBase = () => {
   return url.replace(/\/+$/, '');
 };
 
-const API_BASE = getApiBase();
+export const getFullFileUrl = (url: string | null | undefined): string => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  const backendBase = API_BASE.replace(/\/api\/?$/, '');
+  return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
+export const API_BASE = getApiBase();
 
 class ApiClient {
   private token: string | null = null;
@@ -97,6 +106,15 @@ class ApiClient {
 
       if (!response.ok) {
         throw new Error(data.message || 'An unexpected error occurred');
+      }
+
+      if (data && data.data && typeof data.data === 'object') {
+        if (typeof (data.data as any).downloadUrl === 'string') {
+          (data.data as any).downloadUrl = getFullFileUrl((data.data as any).downloadUrl);
+        }
+        if (typeof (data.data as any).uploadUrl === 'string') {
+          (data.data as any).uploadUrl = getFullFileUrl((data.data as any).uploadUrl);
+        }
       }
 
       return data;

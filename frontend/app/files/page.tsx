@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, getFullFileUrl } from '@/lib/api';
 import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
 import { FileText, Download, Eye, Search, FolderKanban, Loader2, Laptop } from 'lucide-react';
 import { FilePreviewModal } from '@/components/files/FilePreviewModal';
@@ -23,7 +23,7 @@ export default function FilesPage() {
     try {
       const res = await api.get<any>(`/files/${file.id}/download-url`);
       if (res.success && res.data) {
-        setOpenWithDownloadUrl(res.data.downloadUrl);
+        setOpenWithDownloadUrl(getFullFileUrl(res.data.downloadUrl));
       }
     } catch {
       setOpenWithDownloadUrl(null);

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, getFullFileUrl } from '@/lib/api';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useToast } from '@/components/providers/ToastProvider';
 import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
@@ -98,7 +98,7 @@ export default function RoomDetailsPage() {
     try {
       const res = await api.get<any>(`/files/${file.id}/download-url`);
       if (res.success && res.data) {
-        setOpenWithDownloadUrl(res.data.downloadUrl);
+        setOpenWithDownloadUrl(getFullFileUrl(res.data.downloadUrl));
       }
     } catch {
       setOpenWithDownloadUrl(null);
@@ -207,7 +207,8 @@ export default function RoomDetailsPage() {
     try {
       const res = await api.get<any>(`/files/${fileId}/download-url`);
       if (res.success && res.data?.downloadUrl) {
-        window.open(res.data.downloadUrl, '_blank');
+        const fullUrl = getFullFileUrl(res.data.downloadUrl);
+        window.open(fullUrl, '_blank');
         success(`Downloading "${fileName}"`);
       }
     } catch (err: any) {

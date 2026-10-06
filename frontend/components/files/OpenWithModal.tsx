@@ -5,6 +5,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../providers/ToastProvider';
 import { formatBytes } from '@/lib/utils';
+import { getFullFileUrl } from '@/lib/api';
 import {
   ExternalLink,
   Laptop,
@@ -74,7 +75,7 @@ export const OpenWithModal: React.FC<OpenWithModalProps> = ({
   // Determine App Options dynamically based on document extension
   const getAvailableApps = (): OpenTargetApp[] => {
     const apps: OpenTargetApp[] = [];
-    const fullDownloadUrl = downloadUrl || '';
+    const fullDownloadUrl = getFullFileUrl(downloadUrl);
     const encodedUrl = encodeURIComponent(fullDownloadUrl);
 
     // 1. PowerPoint / Presentation files

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../providers/ToastProvider';
-import { api } from '@/lib/api';
+import { api, getFullFileUrl } from '@/lib/api';
 import { formatBytes, formatDate } from '@/lib/utils';
 import {
   Download,
@@ -70,7 +70,7 @@ export const FilePreviewModal: React.FC<FilePreviewModalProps> = ({
         // 2. Fetch download URL
         const urlRes = await api.get<any>(`/files/${fileId}/download-url`);
         if (urlRes.success && urlRes.data) {
-          setDownloadUrl(urlRes.data.downloadUrl);
+          setDownloadUrl(getFullFileUrl(urlRes.data.downloadUrl));
         }
 
         // 3. Fetch editable raw content
