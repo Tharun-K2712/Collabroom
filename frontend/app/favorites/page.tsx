@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { formatBytes, formatDate } from '@/lib/utils';
 import { Star, FolderKanban, FileText, Loader2, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<any[]>([]);
@@ -32,7 +33,8 @@ export default function FavoritesPage() {
   const favoriteFiles = favorites.filter((f) => f.file);
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">Starred & Favorites</h1>
         <p className="text-xs text-muted mt-1">
@@ -116,5 +118,6 @@ export default function FavoritesPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

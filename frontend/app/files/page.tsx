@@ -7,6 +7,7 @@ import { formatBytes, formatDate, getFileTypeInfo } from '@/lib/utils';
 import { FileText, Download, Eye, Search, FolderKanban, Loader2, Laptop } from 'lucide-react';
 import { FilePreviewModal } from '@/components/files/FilePreviewModal';
 import { OpenWithModal } from '@/components/files/OpenWithModal';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function FilesPage() {
   const [files, setFiles] = useState<any[]>([]);
@@ -55,7 +56,8 @@ export default function FilesPage() {
   });
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">Recent & Shared Documents</h1>
         <p className="text-xs text-muted mt-1">
@@ -192,5 +194,6 @@ export default function FilesPage() {
         onOpenInAppPreview={(fileId) => setPreviewFileId(fileId)}
       />
     </div>
+    </DashboardLayout>
   );
 }

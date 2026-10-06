@@ -7,6 +7,7 @@ import { useToast } from '@/components/providers/ToastProvider';
 import { formatDate } from '@/lib/utils';
 import { Bell, CheckCheck, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function NotificationsPage() {
   const { success, error } = useToast();
@@ -55,7 +56,8 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">Notifications Center</h1>
@@ -117,5 +119,6 @@ export default function NotificationsPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

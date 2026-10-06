@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useToast } from '@/components/providers/ToastProvider';
 import { Button } from '@/components/ui/Button';
 import { Bell, Shield, Monitor, Globe, Laptop, Smartphone } from 'lucide-react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function SettingsPage() {
   const { success } = useToast();
@@ -16,7 +17,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <DashboardLayout>
+      <div className="space-y-8 max-w-3xl">
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">Workspace Preferences</h1>
         <p className="text-xs text-muted mt-1">Configure your real-time notification feeds and active session security.</p>
@@ -108,5 +110,6 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 }

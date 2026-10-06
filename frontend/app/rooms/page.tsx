@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CreateRoomModal } from '@/components/rooms/CreateRoomModal';
 import { useToast } from '@/components/providers/ToastProvider';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 function RoomsContent() {
   const searchParams = useSearchParams();
@@ -228,8 +229,10 @@ function RoomsContent() {
 
 export default function RoomsPage() {
   return (
-    <Suspense fallback={<div className="text-center text-xs text-muted py-12">Loading workspaces...</div>}>
-      <RoomsContent />
-    </Suspense>
+    <DashboardLayout>
+      <Suspense fallback={<div className="text-center text-xs text-muted py-12">Loading workspaces...</div>}>
+        <RoomsContent />
+      </Suspense>
+    </DashboardLayout>
   );
 }

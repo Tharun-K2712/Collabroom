@@ -53,6 +53,7 @@ import { RoomAIChatDrawer } from '@/components/ai/RoomAIChatDrawer';
 import { OpenWithModal } from '@/components/files/OpenWithModal';
 import { FolderLauncherModal } from '@/components/files/FolderLauncherModal';
 import { RoomTerminalDrawer } from '@/components/terminal/RoomTerminalDrawer';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function RoomDetailsPage() {
   const router = useRouter();
@@ -302,17 +303,20 @@ export default function RoomDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="h-96 flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-        <p className="text-xs text-muted">Loading workspace room...</p>
-      </div>
+      <DashboardLayout>
+        <div className="h-96 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-xs text-muted">Loading workspace room...</p>
+        </div>
+      </DashboardLayout>
     );
   }
 
   if (!room) return null;
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       {/* Top Breadcrumb & Room Header */}
       <div className="space-y-4">
         <Link
@@ -1092,5 +1096,6 @@ export default function RoomDetailsPage() {
         }}
       />
     </div>
+    </DashboardLayout>
   );
 }

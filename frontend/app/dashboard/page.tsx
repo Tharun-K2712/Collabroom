@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CreateRoomModal } from '@/components/rooms/CreateRoomModal';
 import { FilePreviewModal } from '@/components/files/FilePreviewModal';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -79,7 +80,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <DashboardLayout>
+      <div className="space-y-8">
       {/* Welcome Header & Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -355,5 +357,6 @@ export default function DashboardPage() {
         fileId={previewFileId}
       />
     </div>
+    </DashboardLayout>
   );
 }

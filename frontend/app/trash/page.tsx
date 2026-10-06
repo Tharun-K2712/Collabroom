@@ -6,6 +6,7 @@ import { useToast } from '@/components/providers/ToastProvider';
 import { formatBytes, formatDate } from '@/lib/utils';
 import { Trash2, RotateCcw, AlertTriangle, FileText, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function TrashPage() {
   const { success, error } = useToast();
@@ -62,7 +63,8 @@ export default function TrashPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">Trash Management</h1>
         <p className="text-xs text-muted mt-1">
@@ -132,5 +134,6 @@ export default function TrashPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }

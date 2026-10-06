@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { api } from '@/lib/api';
 import { User, Mail, Phone, Lock, Shield, Check } from 'lucide-react';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -71,7 +72,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="space-y-8 max-w-3xl">
+    <DashboardLayout>
+      <div className="space-y-8 max-w-3xl">
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">Account & Security</h1>
         <p className="text-xs text-muted mt-1">Manage your identity credentials and workspace security profile.</p>
@@ -173,5 +175,6 @@ export default function ProfilePage() {
         </div>
       </form>
     </div>
+    </DashboardLayout>
   );
 }

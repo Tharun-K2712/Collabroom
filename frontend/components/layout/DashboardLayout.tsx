@@ -7,7 +7,7 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { TopNavbar } from '@/components/layout/TopNavbar';
 import { Loader2 } from 'lucide-react';
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
@@ -37,4 +37,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
     </div>
   );
-}
+};

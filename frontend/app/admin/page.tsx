@@ -9,6 +9,7 @@ import { Shield, Users, FolderKanban, FileText, HardDrive, UserX, UserCheck, Loa
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -59,16 +60,19 @@ export default function AdminPage() {
 
   if (user?.systemRole !== 'ADMIN') {
     return (
-      <div className="p-12 rounded-2xl bg-card border border-border text-center space-y-3">
-        <Shield className="w-12 h-12 text-rose-400 mx-auto" />
-        <h2 className="text-lg font-bold text-white">Administrative Access Required</h2>
-        <p className="text-xs text-muted">You do not have system administration privileges.</p>
-      </div>
+      <DashboardLayout>
+        <div className="p-12 rounded-2xl bg-card border border-border text-center space-y-3">
+          <Shield className="w-12 h-12 text-rose-400 mx-auto" />
+          <h2 className="text-lg font-bold text-white">Administrative Access Required</h2>
+          <p className="text-xs text-muted">You do not have system administration privileges.</p>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <DashboardLayout>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -215,5 +219,6 @@ export default function AdminPage() {
         </div>
       )}
     </div>
+    </DashboardLayout>
   );
 }
