@@ -52,7 +52,7 @@ export default function RegisterPage() {
     try {
       await register({ fullName, email, password });
       success('Account created successfully!', 'Welcome to CollabRoom');
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       error(err.message || 'Registration failed');
     } finally {

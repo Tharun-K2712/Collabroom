@@ -24,7 +24,7 @@ export default function LoginPage() {
     try {
       await login({ email, password });
       success('Logged in successfully', 'Welcome Back');
-      router.push('/');
+      router.push('/dashboard');
     } catch (err: any) {
       error(err.message || 'Login failed. Please check your credentials.');
     } finally {

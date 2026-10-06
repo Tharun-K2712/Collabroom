@@ -109,7 +109,7 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             {user ? (
-              <Link href="/rooms">
+              <Link href="/dashboard">
                 <Button variant="primary" size="md">
                   <span>Go to Workspace</span>
                   <ArrowRight className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link href={user ? '/rooms' : '/register'}>
+            <Link href={user ? '/dashboard' : '/register'}>
               <Button variant="primary" size="lg" className="w-full sm:w-auto text-sm px-8 py-3.5">
                 <span>{user ? 'Open Your Dashboard' : 'Create Your First Room'}</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -330,7 +330,7 @@ export default function LandingPage() {
             Experience complete security, cloud document workflows, and real-time collaboration with CollabRoom today.
           </p>
           <div className="pt-2">
-            <Link href={user ? '/rooms' : '/register'}>
+            <Link href={user ? '/dashboard' : '/register'}>
               <Button variant="primary" size="lg" className="px-8 py-3.5 text-sm">
                 <span>Create Your First Room</span>
                 <ArrowRight className="w-4 h-4 ml-2" />

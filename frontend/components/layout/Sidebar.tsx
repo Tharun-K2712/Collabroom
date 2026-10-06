@@ -25,7 +25,7 @@ export const Sidebar: React.FC = () => {
   const { user, logout } = useAuth();
 
   const mainLinks = [
-    { label: 'Dashboard', href: '/', icon: LayoutDashboard },
+    { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { label: 'My Rooms', href: '/rooms?filter=owned', icon: FolderKanban },
     { label: 'Shared With Me', href: '/rooms?filter=shared', icon: Users },
     { label: 'Recent Files', href: '/files', icon: FileText },
@@ -44,7 +44,6 @@ export const Sidebar: React.FC = () => {
   }
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
     return pathname.startsWith(href.split('?')[0]);
   };
 
