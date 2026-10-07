@@ -18,7 +18,7 @@ export class AiService {
   private static extractTextFromFile(storageKey: string, fileName: string): string {
     const localPath = StorageService.getLocalFilePath(storageKey);
     if (!localPath || !fs.existsSync(localPath)) {
-      // In production/cloud, if S3 is used without local cache, provide file metadata representation
+      // In production/cloud, if cloud storage is used without local cache, provide file metadata representation
       return `File ${fileName}: Contains structured business and project documentation regarding room topics, operational procedures, requirements, specifications, and architecture records.`;
     }
 

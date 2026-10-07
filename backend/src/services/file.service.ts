@@ -1,6 +1,6 @@
 import { FileRepository } from '../repositories/file.repository';
 import { StorageService } from './storage.service';
-import { StorageProvider } from '../config/s3';
+import { StorageProvider } from '../config/supabase';
 import { ActivityRepository } from '../repositories/activity.repository';
 import { RoomRepository } from '../repositories/room.repository';
 import { NotFoundError, BadRequestError } from '../utils/errors';

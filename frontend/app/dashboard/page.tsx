@@ -359,7 +359,7 @@ export default function DashboardPage() {
               <span>Zero-Trust Cloud Encryption</span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Files are stored on AWS S3 using temporary pre-signed URLs. Direct access without active room credentials is unconditionally blocked.
+              Files are stored on Supabase Storage using temporary signed URLs. Direct access without active room credentials is unconditionally blocked.
             </p>
           </div>
         </div>

@@ -963,7 +963,7 @@ export default function RoomDetailsPage() {
                 <span>Danger Zone: Delete Room</span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
-                Permanently deletes this collaborative workspace, associated folder hierarchies, and all cloud document versions stored on AWS S3. This action is irreversible.
+                Permanently deletes this collaborative workspace, associated folder hierarchies, and all cloud document versions stored on Supabase Storage. This action is irreversible.
               </p>
 
               <div className="space-y-2 max-w-md pt-2">

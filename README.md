@@ -2,7 +2,7 @@
 
 > **"One Room. One Team. Everything Connected."**
 
-CollabRoom is a production-ready, cloud-based collaborative workspace and document management platform where users can create private rooms, invite team members, assign fine-grained permissions, upload and version documents securely via AWS S3 signed URLs, collaborate in real-time with Socket.IO, and query documents through the **RoomAI** document assistant.
+CollabRoom is a production-ready, cloud-based collaborative workspace and document management platform where users can create private rooms, invite team members, assign fine-grained permissions, upload and version documents securely via Supabase Storage signed URLs, collaborate in real-time with Socket.IO, store relational state in Neon PostgreSQL, and query documents through the **RoomAI** document assistant.
 
 ---
 
@@ -12,15 +12,15 @@ CollabRoom is a production-ready, cloud-based collaborative workspace and docume
 graph TD
     Client[Next.js 14 Frontend<br/>React + Tailwind CSS + Framer Motion]
     Gateway[Express.js REST API & Socket.IO<br/>Authentication & RBAC Middleware]
-    DB[(PostgreSQL Database<br/>Prisma ORM)]
-    S3[(AWS S3 Cloud Storage<br/>Encrypted Presigned URLs)]
+    DB[(Neon PostgreSQL Database<br/>Serverless Prisma ORM)]
+    Supabase[(Supabase Storage<br/>Private File Bucket & Signed URLs)]
     AI[RoomAI Document Assistant<br/>RAG Semantic Engine]
 
     Client -->|JWT Bearer + Socket.IO| Gateway
     Gateway -->|CRUD & Relations| DB
-    Gateway -->|Generate Short-Lived Signed URLs| S3
+    Gateway -->|Generate Short-Lived Signed URLs| Supabase
     Gateway -->|Permission-Scoped Chunk Retrieval| AI
-    Client -.->|Direct Binary Upload/Download via Signed URLs| S3
+    Client -.->|Direct Binary Upload/Download via Signed URLs| Supabase
 ```
 
 ---
@@ -36,9 +36,9 @@ graph TD
    - Granular customizable permissions per member: `canView`, `canUpload`, `canDownload`, `canEdit`, `canDelete`, `canRename`, `canMove`, `canShare`, `canManageMembers`, `canManagePermissions`.
    - **Zero-Trust Backend Security**: Independent verification on every API request.
 
-3. **Cloud Document Management (AWS S3)**:
+3. **Cloud Document Management (Supabase Storage)**:
    - Direct-to-cloud upload & download via temporary signed URLs (no permanent public URLs exposed).
-   - Zero-setup local storage fallback for immediate development without AWS credentials.
+   - Private bucket with scoped room namespaces (`rooms/{roomId}/files/...`).
    - Embedded inline previewers for **PDFs**, **Images**, **Videos**, **Audio**, and **Code files**.
 
 4. **File Versioning & Revision History**:
@@ -74,8 +74,8 @@ graph TD
 |---|---|
 | **Frontend** | Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Framer Motion, TanStack Query |
 | **Backend** | Node.js, Express.js, TypeScript, Controller-Service-Repository Architecture |
-| **Database** | PostgreSQL with Prisma ORM |
-| **Cloud Storage** | AWS S3 (with `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner`) + Local fallback |
+| **Database** | Neon Lakebase PostgreSQL with Prisma ORM |
+| **Cloud Storage** | Supabase Storage (Private bucket with temporary signed URLs) |
 | **Authentication** | JWT Access Tokens, Refresh Token Rotation, bcrypt password hashing, HTTP-Only cookies |
 | **Real-Time** | Socket.IO (Room channels + User-specific notification streams) |
 | **DevOps** | Docker, Docker Compose |

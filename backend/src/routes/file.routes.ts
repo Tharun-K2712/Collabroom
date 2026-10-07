@@ -15,7 +15,7 @@ const router = Router({ mergeParams: true });
 
 router.use(authenticate);
 
-// Request pre-signed upload URL (S3 or local)
+// Request signed upload URL (Supabase Storage or server stream)
 router.post(
   '/rooms/:roomId/files/upload-url',
   requireRoomMember(),

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import fs from 'fs';
-import { StorageProvider, UPLOADS_DIR } from '../config/s3';
+import { StorageProvider, UPLOADS_DIR } from '../config/supabase';
 import { BadRequestError } from '../utils/errors';
 import { ENV } from '../config/env';
 

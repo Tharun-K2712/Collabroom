@@ -34,7 +34,7 @@ export default function LandingPage() {
     },
     {
       icon: Cloud,
-      title: 'AWS S3 File Storage',
+      title: 'Supabase File Storage',
       desc: 'High-speed cloud document storage with encrypted, short-lived signed URLs.',
       color: 'text-cyan-400',
     },
@@ -153,7 +153,7 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-muted max-w-2xl mx-auto leading-relaxed">
-            Securely collaborate, manage documents in AWS S3, enforce multi-tiered RBAC permissions, and work with your team from anywhere on earth.
+            Securely collaborate, manage documents in Supabase Storage, enforce multi-tiered RBAC permissions, and work with your team from anywhere on earth.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -182,7 +182,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <h3 className="font-bold text-sm text-text">AI Research Team Workspace</h3>
-                      <p className="text-xs text-muted">12 Members • 84 Documents • AWS S3 Encrypted</p>
+                      <p className="text-xs text-muted">12 Members • 84 Documents • Supabase Encrypted</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -285,12 +285,12 @@ export default function LandingPage() {
                 Never Trust Frontend UI. Backend Authorization on Every Request.
               </h2>
               <p className="text-sm text-muted leading-relaxed">
-                Even if UI buttons are hidden, our Express backend independently checks room membership, active role permissions, and object-level rights before generating short-lived AWS S3 signed URLs.
+                Even if UI buttons are hidden, our Express backend independently checks room membership, active role permissions, and object-level rights before generating short-lived Supabase Storage signed URLs.
               </p>
 
               <div className="space-y-3 pt-2">
                 {[
-                  'Temporary signed S3 URLs prevent unauthorized file harvesting',
+                  'Temporary signed Supabase URLs prevent unauthorized file harvesting',
                   'Granular 10-point permission overrides per member',
                   'Immutable activity audit logging for compliance',
                   'JWT access token rotation with secure HTTP-only cookies',
@@ -313,7 +313,7 @@ export default function LandingPage() {
                 <p className="text-slate-400">2. Authenticate() validates token signature & status</p>
                 <p className="text-indigo-300">3. RequireRoomMember() confirms room membership</p>
                 <p className="text-indigo-300">4. RequirePermission('canDownload') evaluates role & matrix</p>
-                <p className="text-emerald-400">5. S3 Presigned URL generated (Expires in 3600s) ➔ 200 OK</p>
+                <p className="text-emerald-400">5. Supabase Signed URL generated (Expires in 3600s) ➔ 200 OK</p>
               </div>
             </div>
           </div>

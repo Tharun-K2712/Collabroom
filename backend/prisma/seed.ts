@@ -200,7 +200,7 @@ async function main() {
     data: {
       fileId: reportFile.id,
       userId: arun.id,
-      content: 'Please verify section 4 regarding S3 presigned URL expiration and key hashing.',
+      content: 'Please verify section 4 regarding Supabase Storage signed URL expiration and key hashing.',
     },
   });
 

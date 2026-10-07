@@ -33,7 +33,7 @@ const PORT = ENV.PORT;
 server.listen(PORT, () => {
   logger.info(`🚀 CollabRoom API Server running in ${ENV.NODE_ENV} mode on port ${PORT}`);
   logger.info(`🌐 Frontend URL: ${ENV.FRONTEND_URL}`);
-  logger.info(`📁 Storage Provider: ${ENV.AWS.STORAGE_PROVIDER} (${ENV.AWS.STORAGE_PROVIDER === 's3' ? ENV.AWS.BUCKET_NAME : 'Local Fallback'})`);
+  logger.info(`📁 Storage Provider: ${ENV.STORAGE.PROVIDER} (${ENV.SUPABASE.BUCKET_NAME})`);
 });
 
 // Graceful Shutdown

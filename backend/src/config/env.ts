@@ -14,12 +14,15 @@ export const ENV = {
     REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRATION || '7d',
   },
 
-  AWS: {
-    ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID || process.env.AWS_KEY || '',
-    SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET || '',
-    REGION: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || 'us-east-1',
-    BUCKET_NAME: process.env.AWS_S3_BUCKET || process.env.AWS_BUCKET_NAME || process.env.S3_BUCKET || 'collabroom-documents-bucket',
-    STORAGE_PROVIDER: (process.env.STORAGE_PROVIDER || (process.env.AWS_ACCESS_KEY_ID ? 's3' : 'local')) as 's3' | 'local',
+  SUPABASE: {
+    URL: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bxktvnrvpsoejetaxxaq.supabase.co',
+    KEY: process.env.SUPABASE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_QTVLYK3r6FTmaLLMi5hCyQ_loaZ3ikl',
+    SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    BUCKET_NAME: process.env.SUPABASE_BUCKET || process.env.NEXT_PUBLIC_SUPABASE_BUCKET || 'collabroom-files',
+  },
+
+  STORAGE: {
+    PROVIDER: (process.env.STORAGE_PROVIDER || 'supabase') as 'supabase' | 'local',
   },
 
   EMAIL: {

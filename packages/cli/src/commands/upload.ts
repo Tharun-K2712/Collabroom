@@ -158,16 +158,17 @@ export async function uploadCommand(roomId: string, localPathArg: string) {
           }),
         });
 
-        const { uploadUrl, storageKey, isS3 } = urlRes.data;
+        const { uploadUrl, storageKey, isSupabase, isS3 } = urlRes.data;
         const fileBuffer = fs.readFileSync(file.absolutePath);
 
         // 2. Upload binary
+        const isDirectCloudUpload = isSupabase || isS3 || (!uploadUrl.includes('/api/storage/local-upload'));
         const uploadTarget = uploadUrl.startsWith('http')
           ? uploadUrl
           : `${ApiClient.getBaseUrl().replace(/\/api\/?$/, '')}${uploadUrl}`;
 
         let uploadBinaryRes: Response;
-        if (isS3) {
+        if (isDirectCloudUpload && !uploadUrl.includes('/api/storage/local-upload')) {
           uploadBinaryRes = await fetch(uploadTarget, {
             method: 'PUT',
             body: fileBuffer,
